@@ -1,0 +1,13 @@
+---
+- name: "Play issue.yml"
+  gather_facts: yes
+  hosts: all
+  tasks:
+    - name: "Play issue.yml"
+      lineinfile:
+        path: /etc/issue
+        line: "{{ mystring }}"
+        create: yes
+        owner: root
+        group: root
+        mode: '0644'

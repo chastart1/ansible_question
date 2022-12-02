@@ -1,0 +1,13 @@
+[dev]
+ansible1
+
+[test]
+ansible2
+
+[prod]
+ansible3
+ansible4
+
+[webservers:children]
+prod
+

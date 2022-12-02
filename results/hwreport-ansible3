@@ -1,0 +1,8 @@
+HOST=ansible3
+BIOS=6.00
+MEMORY=777
+SDA_DISK_SIZE=60.00 GB
+SDB_DISK_SIZE=1.00 GB
+            
+SDC_DISK_SIZE=none
+            

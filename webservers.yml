@@ -1,0 +1,46 @@
+---
+- name: Install httpd, firewalld and Service On
+  gather_facts: yes
+  hosts: webservers
+  tasks:
+  # "1 httpd, firewalld 설치"
+  - name: "1 httpd, firewalld 설치"
+    yum:
+      name:
+        - httpd
+        - firewalld
+      state: present
+  # "2 httpd, firewalld 서비스 기동"
+  - name: "2 httpd, firewalld 서비스 기동"
+    service:
+      name: "{{ item }}"
+      state: started
+      enabled: yes
+    loop:  
+      - httpd
+      - firewalld
+  # "3 방화벽에 http,https 허용"
+  - name: "3 방화벽에 http,https 허용"
+    firewalld:
+      service: "{{ item }}"
+        #- http
+        #- https
+      state: enabled
+      permanent: yes
+      immediate: yes
+      
+    loop:
+      - http
+      - https
+  
+  # "4 hello.html 작성"
+  - name: "4 hello.html 작성"
+    file:
+      path: /var/www/html/hello.html
+      state: touch
+
+  # "5 hello.html 라인 추가"
+  - name: "5 hello.html 라인 추가"
+    lineinfile:
+      path: /var/www/html/hello.html
+      line: "Hello world from {{ ansible_fqdn }}"

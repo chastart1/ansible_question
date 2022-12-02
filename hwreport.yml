@@ -1,0 +1,68 @@
+---
+- name: "하드웨어 정보 수집"
+  hosts: all
+  gather_facts: yes
+  tasks:
+  # 1) 파일 배포 (files/hwreport.empty -> /root/hwreport.txt)
+    - name: "1) 파일 배포 (files/hwreport.empty -> /root/hwreport.txt)"
+      copy:
+        src: file/hwreport.empty
+        dest: /root/hwreport.txt
+  # 2) hwreport.txt - inventory hostname 설정
+    - name: "2) hwreport.txt - inventory hostname 설정"
+      lineinfile:
+        path: /root/hwreport.txt
+        regexp: '^HOST='
+        line: "HOST={{ ansible_hostname }}"
+  # 3) hwreport.txt - bios verison 설정 작업
+    - name: "3) hwreport.txt - bios verison 설정 작업"
+      lineinfile:
+        path: /root/hwreport.txt
+        regexp: '^BIOS='
+        line: "BIOS={{ ansible_bios_version }}"
+  # 4) hwreport.txt - memory size 설정
+    - name: "4) hwreport.txt - memory size 설정"
+      lineinfile:
+        path: /root/hwreport.txt
+        regexp: '^MEMORY='
+        line: "MEMORY={{ ansible_memtotal_mb }}"
+  # 5) hwreport.txt - disk size 설정 - /dev/sda,sdb,sdc
+    - name: "5-1) hwreport.txt - disk size 설정 - /dev/sda"
+      lineinfile:
+          path: /root/hwreport.txt
+          regexp: '^SDA_DISK_SIZE='
+          line: |
+            {% if ansible_facts['devices']['sda'] is defined %}
+            SDA_DISK_SIZE={{ ansible_facts['devices']['sda']['size'] }}
+            {% else %}
+            SDA_DISK_SIZE=none
+            {% endif %}
+    - name: "5-2) hwreport.txt - disk size 설정 - /dev/sdb"
+      lineinfile:
+          path: /root/hwreport.txt
+          regexp: '^SDB_DISK_SIZE='
+          line: |
+            {% if ansible_facts['devices']['sdb'] is defined %}
+            SDB_DISK_SIZE={{ ansible_facts['devices']['sdb']['size'] }}
+            {% else %}
+            SDB_DISK_SIZE=none
+            {% endif %}            
+    - name: "5-3) hwreport.txt - disk size 설정 - /dev/sdc"
+      lineinfile:
+          path: /root/hwreport.txt
+          regexp: '^SDC_DISK_SIZE='
+          line: |
+            {% if ansible_facts['devices']['sdc'] is defined %}
+            SDC_DISK_SIZE={{ ansible_facts['devices']['sdc']['size'] }}
+            {% else %}
+            SDC_DISK_SIZE=none
+            {% endif %}            
+    
+    - name: "6) hwreport.txt 가져오기"
+      fetch:
+        src: /root/hwreport.txt
+        dest: results/hwreport-{{ inventory_hostname }}
+        flat: yes
+
+
+  
